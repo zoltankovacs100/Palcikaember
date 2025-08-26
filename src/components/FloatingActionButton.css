@@ -1,0 +1,39 @@
+/* src/components/FloatingActionButton.css - Világos téma */
+.floating-action-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.2s ease;
+}
+
+.floating-action-button:hover {
+  background: var(--primary-dark);
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 8px 25px rgba(1, 145, 140, 0.3);
+}
+
+.floating-action-button:active {
+  transform: scale(0.95);
+  box-shadow: var(--shadow);
+}
+
+@media (max-width: 768px) {
+  .floating-action-button {
+    bottom: 16px;
+    right: 16px;
+    width: 52px;
+    height: 52px;
+  }
+}

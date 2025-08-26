@@ -1,0 +1,146 @@
+/* ColorPicker.css - JAVÍTOTT verzió */
+.color-picker {
+  position: fixed; /* FONTOS: fixed kell a drag-hez! */
+  bottom: 80px;
+  left: 24px;
+  background: rgba(30, 41, 59, 0.98);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  z-index: 200;
+  width: 280px;
+  cursor: default;
+  /* NINCS transform vagy más positioning! */
+}
+
+.color-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.color-picker-title-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-picker-drag-handle {
+  cursor: grab;
+  color: #94A3B8;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* FONTOS: touch-action none a drag-hez! */
+  touch-action: none;
+}
+
+.color-picker-drag-handle:hover {
+  background: rgba(71, 85, 105, 0.5);
+  color: #F1F5F9;
+}
+
+.color-picker-drag-handle:active {
+  cursor: grabbing;
+  background: rgba(71, 85, 105, 0.8);
+}
+
+.color-picker-header h3 {
+  color: #F1F5F9;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.color-picker-close {
+  background: transparent;
+  border: none;
+  color: #94A3B8;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.color-picker-close:hover {
+  background: rgba(71, 85, 105, 0.5);
+  color: #F1F5F9;
+}
+
+.color-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.color-option {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.color-option.selected {
+  border-color: white;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+.color-selected-indicator {
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.color-picker-custom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(71, 85, 105, 0.5);
+}
+
+.color-picker-custom label {
+  color: #94A3B8;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.custom-color-input {
+  width: 50px;
+  height: 36px;
+  border: 2px solid rgba(71, 85, 105, 0.5);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.custom-color-input:hover {
+  border-color: #8B5CF6;
+}
+
+@media (max-width: 768px) {
+  .color-picker {
+    bottom: 70px;
+    left: 16px;
+    right: 16px;
+    width: auto;
+  }
+}

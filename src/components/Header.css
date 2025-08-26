@@ -1,0 +1,127 @@
+/* src/components/Header.css - Jobb kontraszt fehér háttérhez */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 2px solid var(--surface-border); /* Vastagabb border */
+  z-index: 50;
+  padding: 12px 24px;
+  box-shadow: var(--shadow);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.header-title h1 {
+  color: var(--text); /* Sötétebb szöveg */
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.header-subtitle {
+  color: var(--text-secondary); /* Sötétebb másodlagos szöveg */
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-filename {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-light);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  border: 2px solid var(--surface-border); /* Vastagabb border */
+}
+
+.header-filename svg {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.filename-input {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  width: 120px;
+  font-weight: 500;
+}
+
+.filename-input::placeholder {
+  color: var(--text-light);
+}
+
+.save-button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow);
+}
+
+.save-button:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.save-button:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 12px 16px;
+    padding-top: calc(12px + env(safe-area-inset-top));
+    border-bottom-width: 2px;
+  }
+
+  .header-content {
+    flex-wrap: wrap;
+  }
+
+  .header-title h1 {
+    font-size: 18px;
+  }
+
+  .filename-input {
+    width: 80px;
+  }
+
+  .save-button {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+}

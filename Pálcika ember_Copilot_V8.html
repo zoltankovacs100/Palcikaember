@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pálcikaember - szerepek tisztázása</title>
+  <style>
+    html, body {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+    body {
+      box-sizing: border-box;
+      font-family: sans-serif;
+      min-height: 100vh;
+      min-width: 100vw;
+      width: 100vw;
+      height: 100vh;
+      background: #ececec;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: auto; /* Görgetés engedélyezve */
+    }
+    .responsive-container {
+      background: #f0f0f0;
+      border-radius: 24px;
+      box-shadow: 0 6px 36px rgba(60, 60, 100, 0.13), 0 2px 6px rgba(0,0,0,0.09);
+      max-width: 98vw;
+      max-height: 94vh;
+      width: 98vw;
+      height: 94vh;
+      overflow: hidden;
+      box-sizing: border-box;
+      position: relative;
+      min-width: 330px;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 24px;
+    }
+    #stickmanCanvas {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100%;
+      max-height: 100%;
+      min-height: 350px;
+      border-radius: 16px;
+      background: #f0f0f0;
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 0;
+      display: block;
+    }
+    #controls {
+      position: absolute;
+      top: 18px;
+      left: 30px;
+      z-index: 10;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      background: rgba(255,255,255,0.9);
+      padding: 6px 16px;
+      border-radius: 10px;
+      box-shadow: 0 1px 6px rgba(120,120,120,0.07);
+    }
+    #controls input[type="text"] {
+      padding: 3px 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    #buttons {
+      position: absolute;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      background: rgba(255,255,255,0.85);
+      padding: 8px 20px;
+      border-radius: 10px;
+      display: flex;
+      gap: 12px;
+      box-shadow: 0 1px 6px rgba(120,120,120,0.07);
+    }
+    button {
+      margin: 0;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      color: white;
+      cursor: pointer;
+      transition: background 0.15s;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    }
+    #addRoleBtn { background-color: #007acc; }
+    #addRoleBtn:hover { background-color: #005c99; }
+    #saveBtn { background-color: #28a745; }
+    #saveBtn:hover { background-color: #156529; }
+
+    .roleBox {
+      position: absolute;
+      padding: 8px 12px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      cursor: move;
+      z-index: 12;
+      min-width: 80px;
+      min-height: 32px;
+      text-align: center;
+      user-select: none;
+      font-size: 18px;
+      animation: fadeIn 0.5s ease-in-out;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .roleBox:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.07); }
+      100% { transform: scale(1); }
+    }
+    @media (max-width: 700px), (max-height: 700px) {
+      .responsive-container {
+        min-width: 0;
+        min-height: 0;
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        max-width: 100vw;
+        max-height: 100vh;
+        padding: 0;
+      }
+      #buttons {
+        left: 50%;
+        bottom: 8px;
+        padding: 4px 8px;
+      }
+      #controls {
+        top: 5px;
+        left: 5px;
+        padding: 4px 6px;
+      }
+      .roleBox {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="responsive-container" id="mainContainer">
+    <canvas id="stickmanCanvas"></canvas>
+    <div id="controls">
+      <input type="color" id="globalColorPicker" title="Szöveg szín" value="#d00070"/>
+      <input type="text" id="fileNameInput" placeholder="Fájlnév (pl. szerepek)" />
+    </div>
+    <div id="buttons">
+      <button id="addRoleBtn">Szerep hozzáadása</button>
+      <button id="saveBtn">Mentés</button>
+    </div>
+  </div>
+<script>
+const container = document.getElementById('mainContainer');
+const canvas = document.getElementById('stickmanCanvas');
+const ctx = canvas.getContext('2d');
+
+// Frissítés ablakméretváltáskor
+function updateCanvasSize() {
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+  canvas.width = width;
+  canvas.height = height;
+}
+function getRelativeCenter() {
+  return {
+    centerX: canvas.width / 2,
+    centerY: canvas.height / 2 - (canvas.height / 12)
+  }
+}
+function placeRoleBoxes() {
+  roles.forEach((role, idx) => {
+    if (!role.initial) return;
+    const { centerX, centerY } = getRelativeCenter();
+    const radius = role.initial.radius * Math.min(canvas.width, canvas.height)/700;
+    const angle = role.initial.angle;
+    const x = centerX + radius * Math.cos(angle) - role.box.offsetWidth/2;
+    const y = centerY + radius * Math.sin(angle) - role.box.offsetHeight/2;
+    role.box.style.left = x + 'px';
+    role.box.style.top = y + 'px';
+  });
+}
+function drawStickman(context=ctx) {
+  const { centerX, centerY } = getRelativeCenter();
+  context.strokeStyle = "black";
+  context.lineWidth = 3;
+  context.beginPath(); context.arc(centerX, centerY, 20, 0, Math.PI * 2); context.stroke();
+  context.beginPath();
+  context.fillStyle = "black";
+  context.arc(centerX - 7, centerY - 5, 2.5, 0, Math.PI * 2);
+  context.arc(centerX + 7, centerY - 5, 2.5, 0, Math.PI * 2);
+  context.fill();
+  context.beginPath();
+  context.arc(centerX, centerY + 4, 8, 0.15 * Math.PI, 0.85 * Math.PI);
+  context.lineWidth = 2;
+  context.strokeStyle = "#333";
+  context.stroke();
+  context.beginPath(); context.moveTo(centerX, centerY + 20); context.lineTo(centerX, centerY + 80); context.stroke();
+  context.beginPath(); context.moveTo(centerX - 30, centerY + 40); context.lineTo(centerX + 30, centerY + 40); context.stroke();
+  context.beginPath(); context.moveTo(centerX, centerY + 80);
+  context.lineTo(centerX - 30, centerY + 130);
+  context.moveTo(centerX, centerY + 80);
+  context.lineTo(centerX + 30, centerY + 130);
+  context.stroke();
+}
+function drawLines(context=ctx) {
+  const { centerX, centerY } = getRelativeCenter();
+  roles.forEach(role => {
+    const box = role.box.getBoundingClientRect();
+    const boxParent = container.getBoundingClientRect();
+    const x = box.left + box.width / 2 - boxParent.left;
+    const y = box.top + box.height / 2 - boxParent.top;
+    const dx = x - centerX;
+    const dy = y - centerY;
+    const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+    const fromX = centerX + (dx/dist)*30;
+    const fromY = centerY + (dy/dist)*30;
+    context.beginPath();
+    context.strokeStyle = role.color || "#d00070";
+    context.lineWidth = 2;
+    context.moveTo(fromX, fromY);
+    context.lineTo(x, y);
+    context.stroke();
+  });
+}
+function drawRoleBoxesToCanvas(ctxTarget) {
+  const { centerX, centerY } = getRelativeCenter();
+  roles.forEach(role => {
+    const box = role.box.getBoundingClientRect();
+    const cont = container.getBoundingClientRect();
+    const x = box.left + box.width/2 - cont.left;
+    const y = box.top + box.height/2 - cont.top;
+    ctxTarget.save();
+    ctxTarget.font = "18px sans-serif";
+    ctxTarget.textAlign = "center";
+    ctxTarget.textBaseline = "middle";
+    ctxTarget.strokeStyle = "#ccc";
+    ctxTarget.lineWidth = 2;
+    ctxTarget.globalAlpha = 0.9;
+    ctxTarget.fillStyle = "white";
+    ctxTarget.fillRect(x - box.width/2, y - box.height/2, box.width, box.height);
+    ctxTarget.globalAlpha = 1;
+    ctxTarget.strokeRect(x - box.width/2, y - box.height/2, box.width, box.height);
+    ctxTarget.fillStyle = role.box.style.color || "#222";
+    ctxTarget.fillText(role.box.textContent, x, y+1);
+    ctxTarget.restore();
+  });
+}
+function drawEverything(context=ctx, withClear=true) {
+  if (withClear) {
+    context.fillStyle = "#f0f0f0";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  drawStickman(context);
+  drawLines(context);
+}
+
+let roles = [];
+let selectedRole = null;
+let currentColor = "#d00070";
+
+function createRoleBox() {
+  const div = document.createElement('div');
+  div.className = 'roleBox';
+  div.contentEditable = true;
+  div.textContent = 'Új szerep';
+  const N = roles.length;
+  const radius = 150 + 32 * Math.floor(N / 8);
+  const angle = (N % 8) * (Math.PI / 4);
+  roleInitial = {radius, angle};
+  const { centerX, centerY } = getRelativeCenter();
+  div.style.left = (centerX + radius * Math.cos(angle) - 50) + "px";
+  div.style.top = (centerY + radius * Math.sin(angle) - 20) + "px";
+  div.style.color = currentColor;
+
+  div.addEventListener('mousedown', () => { selectedRole = div; });
+  let offsetX = 0, offsetY = 0;
+  div.addEventListener('mousedown', e => {
+    offsetX = e.offsetX;
+    offsetY = e.offsetY;
+    function onMouseMove(ev) {
+      let px = ev.pageX - container.getBoundingClientRect().left - offsetX;
+      let py = ev.pageY - container.getBoundingClientRect().top - offsetY;
+      div.style.left = px+"px";
+      div.style.top  = py+"px";
+      roles.find(r => r.box===div).initial = null;
+      updateAllLines();
+    }
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', () => {
+      document.removeEventListener('mousemove', onMouseMove);
+    }, { once: true });
+  });
+  container.appendChild(div);
+  roles.push({ box: div, color: currentColor, initial: roleInitial });
+  selectedRole = div;
+  updateAllLines();
+  pulseStickman();
+}
+function pulseStickman() {
+  canvas.style.animation = 'pulse 0.4s ease';
+  canvas.addEventListener('animationend', () => canvas.style.animation = '', { once: true });
+}
+function updateAllLines() { drawEverything(); }
+function reflowRolesOnResize() {
+  placeRoleBoxes();
+  updateAllLines();
+}
+
+document.getElementById('addRoleBtn').addEventListener('click', createRoleBox);
+document.getElementById('globalColorPicker').addEventListener('input', e => {
+  currentColor = e.target.value;
+  if (selectedRole) {
+    selectedRole.style.color = currentColor;
+    roles.forEach(role => { if(role.box === selectedRole) role.color = currentColor; });
+    updateAllLines();
+  }
+});
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const fileName = document.getElementById('fileNameInput').value.trim() || 'szerepek';
+  const exportCanvas = document.createElement('canvas');
+  exportCanvas.width = canvas.width;
+  exportCanvas.height = canvas.height;
+  const exportCtx = exportCanvas.getContext('2d');
+  exportCtx.fillStyle = "#f0f0f0";
+  exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+  drawStickman(exportCtx);
+  drawLines(exportCtx);
+  drawRoleBoxesToCanvas(exportCtx);
+
+  exportCanvas.toBlob(blob => {
+    const link = document.createElement('a');
+    link.download = `${fileName}.png`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    const feedback = document.createElement('div');
+    feedback.textContent = '✔️ Elmentve';
+    feedback.style.position = 'fixed';
+    feedback.style.top = '50%';
+    feedback.style.left = '50%';
+    feedback.style.transform = 'translate(-50%, -50%)';
+    feedback.style.backgroundColor = 'rgba(0,0,0,0.7)';
+    feedback.style.color = 'white';
+    feedback.style.padding = '10px 20px';
+    feedback.style.borderRadius = '8px';
+    feedback.style.zIndex = '9999';
+    container.appendChild(feedback);
+    setTimeout(() => {
+      feedback.style.transition = 'opacity 0.5s';
+      feedback.style.opacity = '0';
+      setTimeout(() => feedback.remove(), 500);
+    }, 1000);
+  }, "image/png");
+});
+
+document.addEventListener('click', (e) => {
+  if(e.target.classList.contains('roleBox')) selectedRole = e.target;
+});
+
+function resizeEverything() {
+  updateCanvasSize();
+  reflowRolesOnResize();
+}
+window.addEventListener('resize', resizeEverything);
+
+setInterval(updateAllLines, 150);
+
+resizeEverything();
+drawEverything();
+</script>
+</body>
+</html>
