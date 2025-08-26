@@ -151,7 +151,6 @@ function RoleCard({ role, isSelected, onSelect, onUpdate, onDelete }) {
         userSelect: 'none',
         touchAction: 'none'
       }}
-      onClick={handleClick}
     >
       <div 
         className="role-card-color-indicator"

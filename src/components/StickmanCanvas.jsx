@@ -10,7 +10,7 @@ const StickmanCanvas = forwardRef(({ roles, selectedRole }, ref) => {
 
   useImperativeHandle(ref, () => ({
     exportPdf: (fileName) => {
-      const appElement = document.querySelector('.app-container')
+      const appElement = document.querySelector('.app')
       if (!appElement) return
 
       html2canvas(appElement, {
