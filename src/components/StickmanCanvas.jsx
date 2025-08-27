@@ -20,40 +20,36 @@ const StickmanCanvas = forwardRef(({ roles, selectedRole }, ref) => {
         logging: false,
       }).then(canvas => {
         const imgData = canvas.toDataURL('image/png')
-        
-        // A4 méretek (mm): 210 x 297
-        const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'mm',
-          format: 'a4'
-        })
-        
+
+        // A4 álló, fit-to-page kisebb margókkal
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
         const pdfWidth = pdf.internal.pageSize.getWidth()
         const pdfHeight = pdf.internal.pageSize.getHeight()
-        
-        const canvasAspectRatio = canvas.width / canvas.height
-        const pdfAspectRatio = pdfWidth / pdfHeight
-        
-        let finalWidth, finalHeight
-        if (canvasAspectRatio > pdfAspectRatio) {
-          finalWidth = pdfWidth
-          finalHeight = pdfWidth / canvasAspectRatio
-        } else {
-          finalHeight = pdfHeight
-          finalWidth = pdfHeight * canvasAspectRatio
+        const sideMargin = 5 // mm
+        const topMargin = 5 // mm
+        const footerSpace = 6 // mm
+
+        const availableWidth = pdfWidth - sideMargin * 2
+        const availableHeight = pdfHeight - topMargin - footerSpace
+
+        const imgAspect = canvas.width / canvas.height
+        let targetWidth = availableWidth
+        let targetHeight = targetWidth / imgAspect
+        if (targetHeight > availableHeight) {
+          targetHeight = availableHeight
+          targetWidth = targetHeight * imgAspect
         }
 
-        const x = (pdfWidth - finalWidth) / 2
-        const y = (pdfHeight - finalHeight) / 2
+        const x = (pdfWidth - targetWidth) / 2
+        const y = topMargin
+        pdf.addImage(imgData, 'PNG', x, y, targetWidth, targetHeight)
 
-        pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight)
+        // Lábléc: dátum balra, oldalszám jobbra (nagyobb betű)
+        const dateStr = new Date().toLocaleDateString('hu-HU')
+        pdf.setFontSize(10)
+        pdf.text(dateStr, sideMargin, pdfHeight - 5, { align: 'left' })
+        pdf.text('1', pdfWidth - sideMargin, pdfHeight - 5, { align: 'right' })
 
-        // Időbélyeg
-        const timestamp = new Date().toLocaleString('hu-HU')
-        pdf.setFontSize(8)
-        pdf.setTextColor(150)
-        pdf.text(timestamp, pdfWidth / 2, pdfHeight - 10, { align: 'center' })
-        
         pdf.save(`${fileName}.pdf`)
       })
     }
