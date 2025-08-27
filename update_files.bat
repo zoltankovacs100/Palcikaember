@@ -920,8 +920,9 @@ echo ^<html lang="hu"^>
 echo   ^<head^>
 echo     ^<meta charset="UTF-8" /^>
 echo     ^<!-- Vista Verde favicon --^>
-echo     ^<link rel="icon" type="image/svg+xml" href="/vista-verde.svg" /^>
-echo     ^<link rel="apple-touch-icon" href="/vista-verde-192.png" /^>
+echo     ^<link rel="icon" type="image/x-icon" href="/favicon.ico?v=2" /^>
+echo     ^<link rel="icon" type="image/png" sizes="192x192" href="/vista-verde-192.png?v=2" /^>
+echo     ^<link rel="apple-touch-icon" href="/vista-verde-192.png?v=2" /^>
 echo     ^<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" /^>
 echo     ^<meta name="theme-color" content="#01918C" /^>
 echo     ^<meta name="apple-mobile-web-app-capable" content="yes"^>
@@ -950,11 +951,7 @@ echo   "orientation": "portrait",
 echo   "scope": "/",
 echo   "start_url": "/",
 echo   "icons": [
-echo     {
-echo       "src": "/vista-verde.svg",
-echo       "sizes": "any",
-echo       "type": "image/svg+xml"
-echo     },
+rem SVG favicon eltávolítva
 echo     {
 echo       "src": "/vista-verde-192.png",
 echo       "sizes": "192x192",
